@@ -23,5 +23,5 @@ impl DnsCache {
             })
         }
 }
-
 //Frontier 부분에서 맵핑을 해서 해당 맵핑(host,ip)을 agent에게 전달해줘야 하기때문에 Frontier 모듈에 넣음
+
