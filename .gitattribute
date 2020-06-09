@@ -1,6 +1,0 @@
-# windows=> git config --global core.autocrlf true 
-# mac,linux => git config --global core.autocrlf input
-# Auto detect text files and perform LF normalization
-*	text=auto 
-
-
