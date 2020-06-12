@@ -1,95 +1,114 @@
 //#[derive(Debug)]
-/*enum Protocol {
-    HTTP,
-    HTTPS,
-    FTP,
-}
-*/
 
+use std::{num::ParseIntError, cmp::PartialEq};
+
+const HTTP: &str="http";
+const HTTPS: &str = "https";
+const FTP: &str = "ftp";
+
+#[derive(Debug,Copy,Clone,PartialEq)]
+pub enum Protocol {
+        HTTP,
+        HTTPS,
+        FTP,
+    }
+//enum Protocol을 어떻게 써야 할지 잘모르겠음.
 pub struct UrlParser {
-    protocol:String,
+    protocol:Protocol,
     host: String,
     hostname: String,
     path:String,
-    port:String,
+    port:Option<u16>,
     query:String,
     url:String
 }
 impl UrlParser {
 
-    pub fn url(url : &str)->Self{
-            let mut i_protocol="https".to_string();
-            let i_hostname; //host including port 
-            let mut i_host;
-            let mut i_path="".to_string();
-            let mut i_port="443".to_string();
-            let mut i_query="".to_string();
+    pub fn url(url : &str)->Result<Self,ParseIntError>{
+            let mut protocol=Protocol::HTTPS;
+            let hostname; //host including port 
+            let mut host;
+            let mut path="".to_string();
+            let mut port=None;
+            let mut query="".to_string();
             let mut i_url =url.clone();
             let mut len;
+            let url =url.to_string();
             
             if i_url.contains("//") { //extarct protocol
                 let url_v :Vec<&str> =i_url.split("//").collect();
                 len = url_v[0].len()-1;
-                i_protocol= url_v[0][..len].to_string();
+                let temp =&url_v[0][..len];
+
+                protocol = if temp == "http"{
+                    Protocol::HTTP
+                }else if temp == "ftp" {
+                    Protocol::FTP
+                }else {
+                    Protocol::HTTPS
+                };
+
                 i_url = &url_v[1][..]; 
             }
             
             if i_url.contains("/"){ //extract hostname if none of query, extract path. 
                 let url_v: Vec<&str> = i_url.split("/").collect();
-                i_hostname= url_v[0][..].to_string();
-                i_host= i_hostname.clone();
-                len =i_hostname.len();
+                hostname= url_v[0][..].to_string();
+                host= hostname.clone();
+                len =hostname.len();
                 i_url = &i_url[len..];
-                i_path = url[len..].to_string().clone();
+                path = url[len..].to_string().clone();
             }else {
-                i_hostname =i_url.to_string().clone();
-                i_host=i_url.to_string().clone();
+                hostname =i_url.to_string().clone();
+                host=i_url.to_string().clone();
             }
             
             if i_url.contains("?") { //extract query , path
                 let url_v: Vec<&str> =i_url.split("?").collect();
-                i_path= url_v[0][..].to_string();
-                i_query= url_v[1][..].to_string();
+                path= url_v[0][..].to_string();
+                query= url_v[1][..].to_string();
             }
-            if i_hostname.contains(":"){ //extarct host,port
+            if hostname.contains(":"){ //extarct host,port
                 
-                let url_v :Vec<&str> = i_hostname.split(":").collect();
-                i_host = url_v[0][..].to_string();
-                i_port = url_v[1][..].to_string();
+                let url_v :Vec<&str> = hostname.split(":").collect();
+                host = url_v[0][..].to_string();
+                port = Some(url_v[1][..].to_string().parse::<u16>()?);
             
             }
-    
-            UrlParser{
-                protocol:i_protocol,
-                host: i_host,
-                hostname: i_hostname,
-                path: i_path,
-                port: i_port,
-                query:i_query,
-                url: url.to_string()
-
+            
+            Ok(UrlParser{
+                protocol,
+                host,
+                hostname,
+                path,
+                port,
+                query,
+                url
+            })
+        }
+    pub fn protocol(&self)->Protocol {
+            self.protocol
+        }
+    pub fn host(&self)->String {
+            self.host.clone()
+        }
+    pub fn hostname(&self)->String {
+            self.hostname.clone()
+        }
+    pub fn path(&self)->String{
+            self.path.clone()
+        }
+    pub fn query(&self)->String {
+            self.query.clone()
+        }
+    pub fn port(&self)->u16 {
+            match self.port{
+                Some(n) => { n},
+                None => {443}
             }
         }
-    pub fn protocol(&self)->&String {
-            &self.protocol
-        }
-    pub fn host(&self)->&String {
-            &self.host
-        }
-    pub fn hostname(&self)->&String {
-            &self.hostname
-        }
-    pub fn path(&self)->&String{
-            &self.path
-        }
-    pub fn query(&self)->&String {
-            &self.query
-        }
-    pub fn port(&self)->&String {
-            &self.port
-        }
-    pub fn get_url(&self)->&String {
-            &self.url
+    pub fn get_url(&self)->String {
+            self.url.clone()
         }
 }
 /*
@@ -98,4 +117,3 @@ struct LookUpList {
 }
 //url string 을 키로 하여 이미 읽은 주소인지 여부를 저장한다. 만약 이미 읽은 주소이면 skip하고 , 안 읽었으면 읽고 읽었다고 set한다.
 */
-
