@@ -17,9 +17,9 @@ pub struct UrlParser {
     protocol:Protocol,
     host: String,
     hostname: String,
-    path:String,
+    path:Option<String>,
     port:Option<u16>,
-    query:String,
+    query:Option<String>,
     url:String
 }
 impl UrlParser {
@@ -28,9 +28,9 @@ impl UrlParser {
             let mut protocol=Protocol::HTTPS;
             let hostname; //host including port 
             let mut host;
-            let mut path="".to_string();
+            let mut path=Some("/".to_string());
             let mut port=None;
-            let mut query="".to_string();
+            let mut query=None;
             let mut i_url =url.clone();
             let mut len;
             let url =url.to_string();
@@ -57,7 +57,7 @@ impl UrlParser {
                 host= hostname.clone();
                 len =hostname.len();
                 i_url = &i_url[len..];
-                path = url[len..].to_string().clone();
+                path = Some(url[len..].to_string());
             }else {
                 hostname =i_url.to_string().clone();
                 host=i_url.to_string().clone();
@@ -65,8 +65,8 @@ impl UrlParser {
             
             if i_url.contains("?") { //extract query , path
                 let url_v: Vec<&str> =i_url.split("?").collect();
-                path= url_v[0][..].to_string();
-                query= url_v[1][..].to_string();
+                path= Some(url_v[0][..].to_string());
+                query= Some(url_v[1][..].to_string());
             }
             if hostname.contains(":"){ //extarct host,port
                 
@@ -96,10 +96,16 @@ impl UrlParser {
             self.hostname.clone()
         }
     pub fn path(&self)->String{
-            self.path.clone()
+            match &self.path{
+                Some(n) => n.clone(),
+                None =>"/".to_string()
+            }
         }
     pub fn query(&self)->String {
-            self.query.clone()
+            match &self.query{
+                Some(n)=>n.clone(),
+                None=>"".to_string()
+            }
         }
     pub fn port(&self)->u16 {
             match self.port{
