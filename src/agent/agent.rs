@@ -27,7 +27,8 @@ impl Agent {
             } 
         }
     
-    pub fn get_html_downloader(&mut self, cash_dns :Option<(&String,&IpAddr)>,path:String)->Result<(),Box<dyn Error>> {  //_cash_dns = Dnscash.history.get_key_value(host))                                                      
+    pub fn get_html_downloader(&mut self, cash_dns :Option<(&String,&IpAddr)>,path:String)->Result<(),Box<dyn Error>> {  
+    //_cash_dns = Dnscash.history.get_key_value(host))                                                      
         
             if let Some((host,ip)) = cash_dns{
                 let query = "GET ".to_string() +&path + &" HTTP/1.0\r\n\r\n".to_string();       

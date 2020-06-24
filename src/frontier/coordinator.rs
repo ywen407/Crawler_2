@@ -20,6 +20,6 @@ impl Coordinator {
             agent_queue.add(self.total_to_visit.peek().expect("add url to agent in front")).unwrap();
             self.total_to_visit.remove().expect("totoal remove error");
         }
-
+ 
 }
 
