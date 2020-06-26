@@ -12,7 +12,6 @@ pub struct Coordinator {
     pub destination: Vec<u32>
 }
 
-
 impl Coordinator {
     pub fn new() -> Self { 
         Self { 

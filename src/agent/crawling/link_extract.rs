@@ -7,8 +7,5 @@ impl Agent {
       Visited URL에 추가하고, 아직 수집되지 않은 경우 ToVisitQueue에 추가한다.
       만약 사이트 외부의 URL일 경우 ToSendQueue에 추가한다.
     */
-    pub fn link_extractor() {
-            
-            
-        }
+
 }

@@ -38,7 +38,6 @@ impl Agent {
                     Ok(res)  
                 }else{
                     Err(Box::new(CollectErr::Err("error".to_string())))
-                }
-                                  
+                }                    
          }
 }
