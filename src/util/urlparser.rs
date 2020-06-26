@@ -23,7 +23,7 @@ impl TryFrom<Option<&str>> for Protocol {
 }
 /* 파싱한 스트링을 프로토콜 타입으로 변환. 원치않는 타입조건이면 에러 */
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct Port(u16);
 
 impl TryFrom<Option<&str>> for Port {
@@ -41,7 +41,7 @@ impl TryFrom<Option<&str>> for Port {
     }
 }
 /* 파싱한 스트링을 포트 타입으로 변환. 원치않는 포트면 에러 */
-
+#[derive(Debug,Clone)]
 pub struct UrlParser {
     protocol:Protocol,
     userinfo:Option<String>,
@@ -53,6 +53,8 @@ pub struct UrlParser {
     fragment:Option<String>,
     url:String
 }
+
+
 impl UrlParser {
 
     pub fn url(url : &str)->Result<Self,ParseIntError>{
@@ -200,4 +202,3 @@ struct LookUpList {
 }
 //url string 을 키로 하여 이미 읽은 주소인지 여부를 저장한다. 만약 이미 읽은 주소이면 skip하고 , 안 읽었으면 읽고 읽었다고 set한다.
 */
-

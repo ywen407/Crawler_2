@@ -1,57 +1,35 @@
-use native_tls::TlsConnector;
-use queues::*;
+use md5::Digest;
+use std::collections::HashSet;
+use std::net::IpAddr;
+use queues::Queue;
 use std::collections::HashMap;
-use std::net::{TcpStream, IpAddr};
-use std::fs;
-use std::io::{Read, Write};
-use std::error::Error;
 
-
-use chrono::prelude::*;
 #[derive(Debug)]
 pub struct Agent {
-        pub to_visit_queue : Queue<String>,
-        pub visited_queue : Queue<String>,
+        /*Agent's Data for Crawling */
+        pub to_visit_queue : Queue<IpAddr>,  //방문할 해당 웹페이지의 ip주소.
+        pub visited_queue : Queue<IpAddr>,
         pub to_send_queue : Queue<String>,
-        pub contents_table : HashMap<String,String>, //<IpAddr,u128>?
+        pub contents_table : HashSet<Digest>,
+        /*Agent's Data for Converting */
+        pub id_dic : HashMap<String,String>,
+        pub page_id_dic : HashMap<String,String>,
+        /*Agent's Data for Ranking */
+        pub source : Vec<u32>,
+        pub destination : Vec<u32>
     }
 
-#[allow(dead_code)]
 impl Agent {
     pub fn new() -> Self {
-            Self { 
-                to_visit_queue: Queue::<String>::new(), 
-                visited_queue :Queue::<String>::new(), 
-                to_send_queue :Queue::<String>::new(), 
-                contents_table : HashMap::<String, String>::new() 
-            } 
-        }
-    
-    pub fn get_html_downloader(&mut self, cash_dns :Option<(&String,&IpAddr)>,path:String)->Result<(),Box<dyn Error>> {  
-    //_cash_dns = Dnscash.history.get_key_value(host))                                                      
-        
-            if let Some((host,ip)) = cash_dns{
-                let query = "GET ".to_string() +&path + &" HTTP/1.0\r\n\r\n".to_string();       
-                let query = query.as_bytes();                                                   
-                                         
-                let connector = TlsConnector::new()?;
-                let stream = TcpStream::connect(ip.to_string()+&":443".to_string())?; //caching ip    
-                let mut stream = connector.connect(host,stream)?; //domain.      
-                stream.write_all(&query)?;                                              
-                                                                                        
-                let mut res = vec![];                                                           
-                stream.read_to_end(&mut res)?;                                          
-
-                let dt =Local::now();
-                
-                fs::create_dir_all("./Download/")?;
-                fs::File::create("./Download/".to_owned()+host + &dt.to_rfc3339()[..])?;
-                fs::write("./Download/".to_owned()+host+ &dt.to_rfc3339()[..],&res)?;
-
-                self.visited_queue.add(self.to_visit_queue.peek()?)?;
-                self.to_visit_queue.remove()?;
-            }
-            Ok(())                 
-        }
+        Self { 
+            to_visit_queue: Queue::<IpAddr>::new(), 
+            visited_queue : Queue::<IpAddr>::new(), 
+            to_send_queue : Queue::<String>::new(), 
+            contents_table : HashSet::<Digest>::new(),
+            id_dic : HashMap::<String,String>::new(),
+            page_id_dic : HashMap::<String,String>::new(),
+            source : Vec::<u32>::new(),
+            destination : Vec::<u32>::new()
+        } 
+    }
 }
-
